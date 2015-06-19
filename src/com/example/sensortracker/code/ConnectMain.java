@@ -2,13 +2,13 @@ package com.example.sensortracker.code;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
+import com.example.sensortracker.ActivityWithCallBack;
 
 public class ConnectMain extends Connect {
 
 
 
-	public ConnectMain(Activity activity, String URL) {
+	public ConnectMain(ActivityWithCallBack activity, String URL) {
 		super(activity, URL);
 	}
 
@@ -21,7 +21,7 @@ public class ConnectMain extends Connect {
 		return ret;
 	}
 
-
+	
 
 
 }

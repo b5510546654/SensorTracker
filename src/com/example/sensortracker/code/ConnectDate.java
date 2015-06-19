@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.app.Activity;
+import com.example.sensortracker.ActivityWithCallBack;
+import com.example.sensortracker.ThirdActivity;
+
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -19,37 +21,51 @@ public class ConnectDate extends AsyncTask<String, Integer, ArrayList<String>> {
 	private final String URL;
 	private static String sensor;
 	private final static String link = "http://ime.ist.hokudai.ac.jp/~yamamoto/xbee/xbee-download-by-day.cgi?";
+	private ThirdActivity activity;
+	private static	ArrayList<String> ret;
+	private String type;
 	public static ArrayList<String> getURLandName(String str) {
-		Log.d("title","in getURLandNAme");
-		ArrayList<String> ans = new ArrayList<String>();
+//		Log.d("title","in getURLandNAme");
+		ret = new ArrayList<String>();
 		Pattern pattern = Pattern.compile("<TR><TD> (.*?) </TD>");
 	    Matcher matcher = pattern.matcher(str);
 	    while (matcher.find()) {
 	    	String ymd = matcher.group(1);
-	    	Log.d("title",ymd);
-	        ans.add(link+sensor+"&ymd="+ymd+">"+ymd);
+	    	Log.d("title",link+sensor+"&ymd="+ymd+">"+ymd);
+	        ret.add(link+sensor+"&ymd="+ymd+">"+ymd);
 	    }
-		return ans;
+		return ret;
+	}
+
+	public String getType(String str){
+		Pattern pattern = Pattern.compile(", Type: (.*?)<BR>");
+	    Matcher matcher = pattern.matcher(str);
+	    while (matcher.find()) {
+	    	return matcher.group(1);
+	    }
+		return null;
 	}
 	
-	public ConnectDate(Activity activity,String URL){
+	public ConnectDate(ActivityWithCallBack activity,String URL,String address){
 		loading = new ProgressDialog(activity);
 		loading.setTitle("Sensor");
 		loading.setMessage("loading ... ");
 		loading.setCancelable(false);
 		loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		this.URL = URL;
+		this.activity = (ThirdActivity)activity;
 		sensor = URL.substring(URL.indexOf("addr="));
+//		sensor = "addr="+address;
 		Log.d("sensor",sensor);
 	}
 
 	@Override
 	protected ArrayList<String> doInBackground(String... s) {
 		try{
-		Log.d("title", URL);
+//		Log.d("title", URL);
 		URL oracle = new URL(URL);
 		URLConnection yc = oracle.openConnection();
-		Log.d("title","can connect");
+//		Log.d("title","can connect");
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				yc.getInputStream()));
 		String inputLine;
@@ -58,6 +74,7 @@ public class ConnectDate extends AsyncTask<String, Integer, ArrayList<String>> {
 			temp += inputLine;
 		}
 		in.close();
+		type = getType(temp);
 		return getURLandName(temp);	
 		}
 		catch(Exception e){
@@ -69,12 +86,14 @@ public class ConnectDate extends AsyncTask<String, Integer, ArrayList<String>> {
 	@Override
 	protected void onPostExecute(ArrayList<String> result) {
 		loading.dismiss();
+		activity.type(type);
+		activity.callBack(ret);
 	}
 
 	@Override
 	protected void onPreExecute() {
-		loading.show();
 		super.onPreExecute();
+		loading.show();
 	}
 
 }

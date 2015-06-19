@@ -1,16 +1,22 @@
 package com.example.sensortracker.code;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import android.app.Activity;
 import android.util.Log;
+
+import com.example.sensortracker.ActivityWithCallBack;
+import com.example.sensortracker.SecondActivity;
 
 public class ConnectSec extends Connect {
 
 
 
-	public ConnectSec(Activity activity, String URL) {
+	public ConnectSec(ActivityWithCallBack activity, String URL) {
 		super(activity, URL);
+		Log.d("url",URL);
+		((SecondActivity) activity).callBackAddress(URL.substring(URL.indexOf("coordinator=")+"coordinator=".length()));
 	}
 
 	@Override
@@ -23,8 +29,4 @@ public class ConnectSec extends Connect {
 		}
 		return ret;
 	}
-
-
-
-
 }

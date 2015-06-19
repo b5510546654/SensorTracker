@@ -8,5 +8,7 @@
     <string name="title_activity_third">ThirdActivity</string>
     <string name="title_activity_retreive_data">RetreiveDataActivity</string>
     <string name="coordinatorList">List of coordinator location</string>
+    <string name="SensorID">Sensor ID</string>
+    <string name="Date">Date / Month / Year</string>
 
 </resources>

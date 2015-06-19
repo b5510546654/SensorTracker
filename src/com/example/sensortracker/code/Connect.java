@@ -8,42 +8,42 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.app.Activity;
+import com.example.sensortracker.ActivityWithCallBack;
+
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public abstract class Connect extends AsyncTask<String, Integer, ArrayList<String>> {
 
 	protected ProgressDialog loading;
 	private final String URL;
-
+	private static ArrayList<String> ret;
+	private ActivityWithCallBack activity;
 	public static ArrayList<String> getURLandName(String str) {
 		ArrayList<String> ans = new ArrayList<String>();
 		Pattern pattern = Pattern.compile("<TD><A href=(.*?)</A>");
 	    Matcher matcher = pattern.matcher(str);
 	    while (matcher.find()) {
-	        ans.add(matcher.group(1));
+	    	ans.add(matcher.group(1));
 	    }
 		return ans;
 	}
 	
-	public Connect(Activity activity,String URL){
+	public Connect(ActivityWithCallBack activity,String URL){
 		loading = new ProgressDialog(activity);
 		loading.setTitle("Sensor");
 		loading.setMessage("loading ... ");
 		loading.setCancelable(false);
 		loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		this.URL = URL;
+		this.activity = activity;
 	}
 
 	@Override
 	protected ArrayList<String> doInBackground(String... s) {
 		try{
-		Log.d("title", URL);
 		URL oracle = new URL(URL);
 		URLConnection yc = oracle.openConnection();
-		Log.d("title","can connect");
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				yc.getInputStream()));
 		String inputLine;
@@ -52,7 +52,8 @@ public abstract class Connect extends AsyncTask<String, Integer, ArrayList<Strin
 			temp += inputLine;
 		}
 		in.close();
-		return getAns(getURLandName(temp));	
+		ret = getAns(getURLandName(temp));	
+		return ret;
 		}
 		catch(Exception e){
 			return null;
@@ -67,12 +68,13 @@ public abstract class Connect extends AsyncTask<String, Integer, ArrayList<Strin
 	@Override
 	protected void onPostExecute(ArrayList<String> result) {
 		loading.dismiss();
+		activity.callBack(ret);
 	}
 
 	@Override
 	protected void onPreExecute() {
-		loading.show();
 		super.onPreExecute();
+		loading.show();
 	}
 
 }

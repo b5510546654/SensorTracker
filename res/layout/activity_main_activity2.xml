@@ -8,21 +8,35 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.sensortracker.SecondActivity" >
 
-    <ScrollView
-        android:id="@+id/scrollView1"
+  
+    <LinearLayout
+        android:id="@+id/LinearLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#E3E3E3"
-        android:fillViewport="true"
-        android:padding="4dp" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
-        <LinearLayout
-            android:id="@+id/LinearLayoutForButton"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/TextView01"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:text="@string/SensorID"
+            android:textSize="24sp" />
 
-        </LinearLayout>
-    </ScrollView>
+        <ScrollView
+            android:id="@+id/scrollView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#E3E3E3"
+            android:fillViewport="true"
+            android:padding="4dp" >
+
+            <LinearLayout
+                android:id="@+id/LinearLayoutForButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
 </RelativeLayout>
