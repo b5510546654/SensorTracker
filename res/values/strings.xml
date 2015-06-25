@@ -10,5 +10,34 @@
     <string name="coordinatorList">List of coordinator location</string>
     <string name="SensorID">Sensor ID</string>
     <string name="Date">Date / Month / Year</string>
+    <string name="ApplicationName">ApplicationName</string>
+    
+    <string name="value">Value</string>
+    <string name="viewBy">View By</string>
+    <string name="value_from_prompt">Choose a value</string>
+    <string name="view_by_prompt">Choose a period</string>
+    
+    
+    <string-array name="value_from_list">
+        <item>Choose a value</item>
+        <item>AD0</item>
+        <item>AD1</item>
+        <item>AD2</item>
+        <item>AD3</item>
+        <item>DIO</item>
+        <item>V</item>
+        <item>TP</item>
+        <item>RSSI</item>
+        <item>CH-A</item>
+        <item>CH-B</item>
+    </string-array>
+    
+    <string-array name="view_by_list">
+        <item>Choose a period</item>
+        <item>Date</item>
+        <item>Week</item>
+        <item>Month</item>
+        <item>Year</item>
+    </string-array>
 
 </resources>

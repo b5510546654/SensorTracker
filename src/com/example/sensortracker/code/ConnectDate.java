@@ -86,7 +86,6 @@ public class ConnectDate extends AsyncTask<String, Integer, ArrayList<String>> {
 	@Override
 	protected void onPostExecute(ArrayList<String> result) {
 		loading.dismiss();
-		activity.type(type);
 		activity.callBack(ret);
 	}
 

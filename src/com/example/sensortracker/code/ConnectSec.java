@@ -1,9 +1,6 @@
 package com.example.sensortracker.code;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.util.Log;
 
 import com.example.sensortracker.ActivityWithCallBack;

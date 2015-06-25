@@ -16,7 +16,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	private SQLiteDatabase sqLiteDatabase;
 	private static DBHelper instance;
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 
 
 	private DBHelper(Context context){
@@ -105,22 +105,83 @@ public class DBHelper extends SQLiteOpenHelper {
 	}
 	
 	public List<Sensor> getByDay(String address,String type ,String time){
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date(time));
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		Calendar from = (Calendar)calendar.clone();
-		Calendar to = (Calendar)calendar.clone();
+		Calendar to = Calendar.getInstance();
+		to.setTime(new Date(time));
+		to.set(Calendar.HOUR_OF_DAY, 0);
+		to.set(Calendar.MINUTE, 0);
+		to.set(Calendar.SECOND, 0);
+		
+		Calendar from = (Calendar)to.clone();
 		to.add(Calendar.DATE, 1);
 		Log.d("date format",sdf.format(from.getTime()));
 		return getSensor(address, type, sdf.format(from.getTime()), sdf.format(to.getTime()));
 	}
 	
-//	public List<Sensor> getByWeek(String address,String type,String time){
-//		
-//	}
+	public List<Sensor> getByWeek(String address,String type,String time){
+		Calendar to = Calendar.getInstance();
+		to.setTime(new Date(time));
+		to.set(Calendar.HOUR_OF_DAY, 0);
+		to.set(Calendar.MINUTE, 0);
+		to.set(Calendar.SECOND, 0);
+		to.set(Calendar.DAY_OF_WEEK,7);
+		
+		Calendar from = (Calendar)to.clone();
+		from.set(Calendar.DAY_OF_WEEK, 0);
+		if(from.get(Calendar.DATE) >= to.get(Calendar.DATE))
+			from.add(Calendar.DATE,-7);
+		to.add(Calendar.DATE, 1);
+		from.add(Calendar.DATE, 1);
+		return getSensor(address, type, sdf.format(from.getTime()), sdf.format(to.getTime()));
+	}
+	public List<Sensor> getByMonth(String address,String type,String time){
+		Calendar to = Calendar.getInstance();
+		to.setTime(new Date(time));
+		to.set(Calendar.HOUR_OF_DAY, 0);
+		to.set(Calendar.MINUTE, 0);
+		to.set(Calendar.SECOND, 0);
+	
+		Calendar from = (Calendar)to.clone();
+		from.set(Calendar.DATE,1);
+		to.add(Calendar.MONTH, 1);
+		to.set(Calendar.DATE, 1);
+		return getSensor(address, type, sdf.format(from.getTime()), sdf.format(to.getTime()));
+	}
 
+	public List<Date> containsWeek(String address,String type,String time){
+		Calendar to = Calendar.getInstance();
+		to.setTime(new Date(time));
+		to.set(Calendar.DAY_OF_WEEK,7);
+		
+		Calendar from = (Calendar)to.clone();
+		from.set(Calendar.DAY_OF_WEEK, 0);
+		if(from.get(Calendar.DATE) >= to.get(Calendar.DATE))
+			from.add(Calendar.DATE,-7);
+		to.add(Calendar.DATE, 1);
+		from.add(Calendar.DATE, 1);
+		return getTime(address, type, sdf.format(from.getTime()), sdf.format(to.getTime()));
+	}
+	
+	public List<Date> getTime(String address,String type ,String from,String to) {
+		List<Date> times = new ArrayList<Date>();
+		sqLiteDatabase = this.getWritableDatabase();
+		String sql;
+			sql = String.format("select sensor.datetime from sensor where sensor.address = '%s' and sensor.type = '%s' and sensor.datetime between '%s' and '%s'",address,type,from,to);
+		Log.d("sql",sql);
+		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+		if (cursor != null) {
+			cursor.moveToFirst();
+		}
+
+		while(!cursor.isAfterLast()) {
+			//sensor attribute
+			times.add(new Date(cursor.getString(0)));
+			
+			cursor.moveToNext();
+		}
+		sqLiteDatabase.close();
+
+		return times;
+	}
 	public void addSensor(Sensor sensor){
 //		Log.d("time",sdf.format(sensor.getDatetime()));
 		String sql = String.format("insert into sensor (datetime,address,ip,type,ad0,ad1,ad2,ad3,DIO,V,TP,RSSI)values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')", sdf.format(sensor.getDatetime()),sensor.getAddress(),sensor.getIp(),sensor.getType(),sensor.getAd0(),sensor.getAd1(),sensor.getAd2(),sensor.getAd3(),sensor.getDIO(),sensor.getV(),sensor.getTP(),sensor.getRSSI());

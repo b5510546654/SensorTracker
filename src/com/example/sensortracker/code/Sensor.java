@@ -94,6 +94,21 @@ public class Sensor {
 	public void setRSSI(String rSSI) {
 		RSSI = rSSI;
 	}
+
+	public String getByString(String str){
+		if(str.equals("address")) return address;
+		if(str.equals("ip")) return ip;
+		if(str.equals("type")) return type;
+		if(str.equals("AD0")) return ad0;
+		if(str.equals("AD1")) return ad1;;
+		if(str.equals("AD2")) return ad2;
+		if(str.equals("AD3")) return ad3;
+		if(str.equals("DIO")) return DIO;
+		if(str.equals("V")) return V;
+		if(str.equals("TP")) return TP;
+		if(str.equals("RSSI")) return RSSI;
+		return null;
+	}
 	@Override
 	public String toString() {
 		return "Sensor [id=" + id + ", datetime=" + datetime + ", address="

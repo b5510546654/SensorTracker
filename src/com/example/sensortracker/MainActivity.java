@@ -14,6 +14,7 @@ public class MainActivity extends ActivityWithCallBack {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		searchView();
 		ConnectMain connect = new ConnectMain(this,URL);
 		connect.execute();
 	}
@@ -39,7 +40,10 @@ public class MainActivity extends ActivityWithCallBack {
 	@Override
 	public void callBack(ArrayList<String> URLs) {
 		LinearLayout scrViewButLay = (LinearLayout)findViewById(R.id.LinearLayoutForButton);
-		Button[] myButton = new Button[URLs.size()];
+//		if(filter != null){
+//			URLs = filter(URLs);
+//		}
+		myButton = new Button[URLs.size()];
 		for(int i = 0;i<URLs.size();i++){
 			String[] temp = URLs.get(i).split(">");
 			myButton[i] = new Button(this);

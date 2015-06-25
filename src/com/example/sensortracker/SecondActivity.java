@@ -19,6 +19,7 @@ public class SecondActivity extends ActivityWithCallBack {
 		Log.d("URL","from sec : "+URL);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_activity2);
+		searchView();
 		Connect connect = new ConnectSec(this,URL);
 		connect.execute();
 	}
@@ -44,7 +45,10 @@ public class SecondActivity extends ActivityWithCallBack {
 	@Override
 	public void callBack(ArrayList<String> URLs) {
 		LinearLayout scrViewButLay = (LinearLayout)findViewById(R.id.LinearLayoutForButton);		
-		Button[] myButton = new Button[URLs.size()];
+//		if(filter != null){
+//			URLs = filter(URLs);
+//		}
+		myButton = new Button[URLs.size()];
 		for(int i = 0;i<URLs.size();i++){
 			String[] temp = URLs.get(i).split(">");
 			myButton[i] = new Button(this);

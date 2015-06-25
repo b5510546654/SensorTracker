@@ -14,6 +14,141 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
+        <LinearLayout
+            android:id="@+id/header"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/appName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#E3E3E3"
+                android:text="@string/ApplicationName"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/TextView01"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/SensorID"
+            android:textSize="24sp" />
+
+        <LinearLayout
+            android:id="@+id/valueSelect"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal" >
+
+            <!--
+            <TextView
+                android:id="@+id/viewValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text="@string/value"
+                android:textSize="20sp" />
+            -->
+
+            <Spinner
+                android:id="@+id/spinnerValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:entries="@array/value_from_list"
+                android:prompt="@string/value_from_prompt" />
+
+            <Spinner
+                android:id="@+id/spinnerPeriod"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:entries="@array/view_by_list"
+                android:prompt="@string/view_by_prompt"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <!--
+        <LinearLayout
+            android:id="@+id/periodSelect"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/viewBy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2.0"
+                android:text="@string/viewBy"
+                android:textSize="20sp" />
+
+            <Spinner
+                android:id="@+id/spinnerPeriod"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:entries="@array/view_by_list"
+                android:prompt="@string/view_by_prompt" />
+        </LinearLayout>
+        -->
+
+        <LinearLayout
+            android:id="@+id/datePickLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/dateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="dd-mm-yyyy"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:layout_weight="2.0" />
+
+            <Button
+                android:id="@+id/buttonDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pick Date"
+                android:layout_weight="1.0" />
+
+            <Button
+                android:id="@+id/buttonGetData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Get Data"
+                android:layout_weight="1.0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/graphLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/graphText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hello_world" />
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/graph"
+                android:layout_width="match_parent"
+                android:layout_height="500dip"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!--
         <TextView
             android:id="@+id/TextView01"
             android:layout_width="wrap_content"
@@ -36,6 +171,7 @@
                 android:orientation="vertical" >
             </LinearLayout>
         </ScrollView>
+        -->
     </LinearLayout>
 
 </RelativeLayout>
