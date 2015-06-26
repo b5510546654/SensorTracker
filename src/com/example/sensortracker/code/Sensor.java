@@ -2,20 +2,20 @@ package com.example.sensortracker.code;
 
 import java.util.Date;
 
-public class Sensor {
+public class Sensor implements Comparable<Sensor>{
 	private int id;
 	private Date datetime;
 	private String address;
 	private String ip;
 	private String type;
-	private String ad0 ;
-	private String ad1;
-	private String ad2;
-	private String ad3;
-	private String DIO;
-	private String V;
-	private String TP;
-	private String RSSI;
+	private double ad0 ;
+	private double ad1;
+	private double ad2;
+	private double ad3;
+	private double DIO;
+	private double V;
+	private double TP;
+	private double RSSI;
 	public int getId() {
 		return id;
 	}
@@ -46,69 +46,69 @@ public class Sensor {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public String getAd0() {
+	public double getAd0() {
 		return ad0;
 	}
-	public void setAd0(String ad0) {
+	public void setAd0(double ad0) {
 		this.ad0 = ad0;
 	}
-	public String getAd1() {
+	public double getAd1() {
 		return ad1;
 	}
-	public void setAd1(String ad1) {
+	public void setAd1(double ad1) {
 		this.ad1 = ad1;
 	}
-	public String getAd2() {
+	public double getAd2() {
 		return ad2;
 	}
-	public void setAd2(String ad2) {
+	public void setAd2(double ad2) {
 		this.ad2 = ad2;
 	}
-	public String getAd3() {
+	public double getAd3() {
 		return ad3;
 	}
-	public void setAd3(String ad3) {
+	public void setAd3(double ad3) {
 		this.ad3 = ad3;
 	}
-	public String getDIO() {
+	public double getDIO() {
 		return DIO;
 	}
-	public void setDIO(String dIO) {
+	public void setDIO(double dIO) {
 		DIO = dIO;
 	}
-	public String getV() {
+	public double getV() {
 		return V;
 	}
-	public void setV(String v) {
+	public void setV(double v) {
 		V = v;
 	}
-	public String getTP() {
+	public double getTP() {
 		return TP;
 	}
-	public void setTP(String tP) {
+	public void setTP(double tP) {
 		TP = tP;
 	}
-	public String getRSSI() {
+	public double getRSSI() {
 		return RSSI;
 	}
-	public void setRSSI(String rSSI) {
+	public void setRSSI(double rSSI) {
 		RSSI = rSSI;
 	}
 
-	public String getByString(String str){
-		if(str.equals("address")) return address;
-		if(str.equals("ip")) return ip;
-		if(str.equals("type")) return type;
-		if(str.equals("AD0")) return ad0;
-		if(str.equals("AD1")) return ad1;;
-		if(str.equals("AD2")) return ad2;
-		if(str.equals("AD3")) return ad3;
-		if(str.equals("DIO")) return DIO;
-		if(str.equals("V")) return V;
-		if(str.equals("TP")) return TP;
-		if(str.equals("RSSI")) return RSSI;
-		return null;
-	}
+//	public String getByString(String str){
+//		if(str.equals("address")) return address;
+//		if(str.equals("ip")) return ip;
+//		if(str.equals("type")) return type;
+//		if(str.equals("AD0")) return ad0+"";
+//		if(str.equals("AD1")) return ad1+"";
+//		if(str.equals("AD2")) return ad2+"";
+//		if(str.equals("AD3")) return ad3+"";
+//		if(str.equals("DIO")) return DIO+"";
+//		if(str.equals("V")) return V+"";
+//		if(str.equals("TP")) return TP+"";
+//		if(str.equals("RSSI")) return RSSI+"";
+//		return ad0+"";
+//	}
 	@Override
 	public String toString() {
 		return "Sensor [id=" + id + ", datetime=" + datetime + ", address="
@@ -117,8 +117,8 @@ public class Sensor {
 				+ DIO + ", V=" + V + ", TP=" + TP + ", RSSI=" + RSSI + "]";
 	}
 	public Sensor(Date datetime, String address, String ip, String type,
-			String ad0, String ad1, String ad2, String ad3, String dIO,
-			String v, String tP, String rSSI) {
+			double ad0, double ad1, double ad2, double ad3, double DIO,
+			double V, double TP, double RSSI) {
 		super();
 		this.datetime = datetime;
 		this.address = address;
@@ -128,9 +128,32 @@ public class Sensor {
 		this.ad1 = ad1;
 		this.ad2 = ad2;
 		this.ad3 = ad3;
-		DIO = dIO;
-		V = v;
-		TP = tP;
-		RSSI = rSSI;
+		this.DIO = DIO;
+		this.V = V;
+		this.TP = TP;
+		this.RSSI = RSSI;
+	}
+	
+	public Sensor(Date datetime, String address, String ip, String type,
+			String ad0, String ad1, String ad2, String ad3, String DIO,
+			String V, String TP, String RSSI) {
+		super();
+		this.datetime = datetime;
+		this.address = address;
+		this.ip = ip;
+		this.type = type;
+		this.ad0 = Double.parseDouble(ad0);
+		this.ad1 = Double.parseDouble(ad1);
+		this.ad2 = Double.parseDouble(ad2);
+		this.ad3 = Double.parseDouble(ad3);
+		this.DIO = Double.parseDouble(DIO);
+		this.V = Double.parseDouble(V);
+		this.TP = Double.parseDouble(TP);
+		this.RSSI = Double.parseDouble(RSSI);
+	}
+	
+	@Override
+	public int compareTo(Sensor o) {
+	    return getDatetime().compareTo(o.getDatetime());
 	}
 }

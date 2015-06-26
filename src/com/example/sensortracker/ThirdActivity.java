@@ -1,7 +1,9 @@
 package com.example.sensortracker;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 
 import android.app.DatePickerDialog;
@@ -19,10 +21,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.sensortracker.code.*;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.PointsGraphSeries;
 public class ThirdActivity extends ActivityWithCallBack{
 	private String URL ;
 	private String address;
@@ -35,13 +39,13 @@ public class ThirdActivity extends ActivityWithCallBack{
 	private int year;
 	private int month;
 	private int day;
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd\nHH:mm");
 
 	static final int DATE_DIALOG_ID = 100;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		URL = getIntent().getExtras().getString("url");
 		address = getIntent().getExtras().getString("address");
-		Log.d("URL","from third : "+URL);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_third);
 		//		ConnectDate connect = new ConnectDate(this,URL,address);
@@ -71,7 +75,7 @@ public class ThirdActivity extends ActivityWithCallBack{
 
 	@Override
 	public void callBack(ArrayList<String> URLs) {
-//		setContentView(R.layout.activity_third);
+		//		setContentView(R.layout.activity_third);
 		//		TextView textView = (TextView)findViewById(R.id.TextView01);
 		//		textView.setText("");
 		//		for(int i = 0;i<sensors.size();i++){
@@ -80,32 +84,49 @@ public class ThirdActivity extends ActivityWithCallBack{
 		GraphView graph = (GraphView) findViewById(R.id.graph);
 		graph.removeAllSeries();
 		DataPoint[] datapoint = new DataPoint[URLs.size()];
-		Date min = new Date();
-		Date max = new Date();
+		String [] tm = URLs.get(0).split(">");
+		ArrayList<Date> dates = new ArrayList<Date>();
+		Date min = new Date(tm[0]);
+		Date max = new Date(tm[0]);
 		for(int i = 0;i<URLs.size();i++){
 			String [] temp = URLs.get(i).split(">");
 			Date date = new Date(temp[0]);
 			datapoint[i] = new DataPoint(new Date(temp[0]),Double.parseDouble(temp[1]));
-			if(min.compareTo(date) > 0)
+			dates.add(date);
+			if(min.getTime() > date.getTime())
 				min = date;
-			if(max.compareTo(date) < 0)
+			if(max.getTime() < date.getTime())
 				max = date;
-			
 		}
+		Log.d("URL",URLs.size()+"");
 		LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoint);
-		graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
-//		graph.getGridLabelRenderer().resetStyles();
-		graph.getViewport().setMinX(min.getTime());
-		graph.getViewport().setMaxX(max.getTime());
+//		series.setSize(4);
+//		graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
+		//		graph.getGridLabelRenderer().resetStyles();
+		Log.d("time","min : "+sdf.format(Collections.min(dates).getTime()));
+		Log.d("time","max : "+sdf.format(Collections.max(dates).getTime()));
+		Log.d("time","min : "+sdf.format(min.getTime()));
+		Log.d("time","max : "+sdf.format(max.getTime()));
+		graph.getViewport().setMinX(Collections.min(dates).getTime());
+		graph.getViewport().setMaxX(Collections.max(dates).getTime());
 		graph.getViewport().setXAxisBoundsManual(true);
+		graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
+			@Override
+			public String formatLabel(double value,boolean isValueX){
+				if(isValueX)
+					return sdf.format(new Date((long) value));
+				else
+					return value+"";
+			}
 
+		});
 
 		graph.addSeries(series);
 		graph.setVisibility(GraphView.VISIBLE);
-		
-		
-		
-		
+
+
+
+
 		//		LinearLayout scrViewButLay = (LinearLayout)findViewById(R.id.LinearLayoutForButton);
 		//		//		if(filter != null){
 		//		//			URLs = filter(URLs);
@@ -213,15 +234,15 @@ public class ThirdActivity extends ActivityWithCallBack{
 		}
 
 	}
-	
+
 	public static double parseDoubleSafely(String str) {
-	    double result = 0;
-	    try {
-	        result = Double.parseDouble(str);
-	    } catch (NullPointerException npe) {
-	    } catch (NumberFormatException nfe) {
-	    }
-	    return result;
+		double result = 0;
+		try {
+			result = Double.parseDouble(str);
+		} catch (NullPointerException npe) {
+		} catch (NumberFormatException nfe) {
+		}
+		return result;
 	}
 
 }
