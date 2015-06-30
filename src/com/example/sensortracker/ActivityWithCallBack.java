@@ -2,8 +2,10 @@ package com.example.sensortracker;
 
 import java.util.ArrayList;
 
+import com.example.sensortracker.code.DBHelper;
+
 import android.app.Activity;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +15,17 @@ public abstract class ActivityWithCallBack extends Activity {
 	protected Button[] myButton;
 	public ActivityWithCallBack() {
 		super();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			DBHelper dbhelper = DBHelper.getInstance(this);
+			dbhelper.clear();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	public void searchView(){

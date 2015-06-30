@@ -39,5 +39,6 @@
         <item>Month</item>
         <item>Year</item>
     </string-array>
+        <string name="ClearData">Clear Data</string>
 
 </resources>

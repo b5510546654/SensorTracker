@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
+import android.R.integer;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -39,9 +41,8 @@ public class ThirdActivity extends ActivityWithCallBack{
 	private int year;
 	private int month;
 	private int day;
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd\nHH:mm");
-
 	static final int DATE_DIALOG_ID = 100;
+	private String period;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		URL = getIntent().getExtras().getString("url");
@@ -62,18 +63,6 @@ public class ThirdActivity extends ActivityWithCallBack{
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
 	public void callBack(ArrayList<String> URLs) {
 		//		setContentView(R.layout.activity_third);
 		//		TextView textView = (TextView)findViewById(R.id.TextView01);
@@ -85,28 +74,54 @@ public class ThirdActivity extends ActivityWithCallBack{
 		graph.removeAllSeries();
 		DataPoint[] datapoint = new DataPoint[URLs.size()];
 		String [] tm = URLs.get(0).split(">");
-		ArrayList<Date> dates = new ArrayList<Date>();
-		Date min = new Date(tm[0]);
-		Date max = new Date(tm[0]);
+		List<Date> dates = new ArrayList<Date>();
+		List<DataPoint[]> datapoints = new ArrayList<DataPoint[]>();
+		Date before = null;
+		List<Integer> counter = new ArrayList<Integer>();
+		counter.add(0);
+		int runner = 0;
 		for(int i = 0;i<URLs.size();i++){
 			String [] temp = URLs.get(i).split(">");
 			Date date = new Date(temp[0]);
-			datapoint[i] = new DataPoint(new Date(temp[0]),Double.parseDouble(temp[1]));
-			dates.add(date);
-			if(min.getTime() > date.getTime())
-				min = date;
-			if(max.getTime() < date.getTime())
-				max = date;
+			if(before != null && date.getTime() - before.getTime() > 24*60*60*1000){
+				counter.add(0);
+				runner++;
+//				Log.d("runner",runner+"");
+			}
+			counter.set(runner, counter.get(runner)+1);
+			before = date;
 		}
-		Log.d("URL",URLs.size()+"");
-		LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoint);
-//		series.setSize(4);
-//		graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
-		//		graph.getGridLabelRenderer().resetStyles();
-		Log.d("time","min : "+sdf.format(Collections.min(dates).getTime()));
-		Log.d("time","max : "+sdf.format(Collections.max(dates).getTime()));
-		Log.d("time","min : "+sdf.format(min.getTime()));
-		Log.d("time","max : "+sdf.format(max.getTime()));
+		for(int i = 0;i<URLs.size();i++){
+			String [] temp = URLs.get(i).split(">");
+			Date date = new Date(temp[0]);
+			datapoint[i] = new DataPoint(date,Double.parseDouble(temp[1]));
+			dates.add(date);
+		}
+		
+		int count = counter.get(0);
+		int a = 0;
+		int b = 1;
+		DataPoint[] dtemp = new DataPoint[count];
+		for(int i =0;i<URLs.size();i++){
+			if(a < count){
+				dtemp[a] = new DataPoint(datapoint[i].getX(), datapoint[i].getY());
+				a++;
+			}
+			else{
+				datapoints.add(dtemp);
+				count = counter.get(b);
+				dtemp = new DataPoint[count];
+				a = 0;
+				b++;
+				i--;
+			}
+			if(i == URLs.size()-1)
+				datapoints.add(dtemp);
+//			Log.d("abc",a+" "+b+" "+count);
+		}
+		
+//		Log.d("URL",URLs.size()+"");
+//		LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoint);
 		graph.getViewport().setMinX(Collections.min(dates).getTime());
 		graph.getViewport().setMaxX(Collections.max(dates).getTime());
 		graph.getViewport().setXAxisBoundsManual(true);
@@ -114,34 +129,30 @@ public class ThirdActivity extends ActivityWithCallBack{
 			@Override
 			public String formatLabel(double value,boolean isValueX){
 				if(isValueX)
-					return sdf.format(new Date((long) value));
+					return chooseDateFormat().format(new Date((long) value));
 				else
 					return value+"";
 			}
 
 		});
-
-		graph.addSeries(series);
+//		graph.addSeries(series);
+		for(int i = 0;i<datapoints.size();i++){
+			LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoints.get(i));
+			graph.addSeries(series);
+		}
 		graph.setVisibility(GraphView.VISIBLE);
-
-
-
-
-		//		LinearLayout scrViewButLay = (LinearLayout)findViewById(R.id.LinearLayoutForButton);
-		//		//		if(filter != null){
-		//		//			URLs = filter(URLs);
-		//		//		}
-		//		myButton = new Button[URLs.size()];
-		//		for(int i = 0;i<URLs.size();i++){
-		//			//			Log.d("input sec",URLs.get(i));
-		//			final String[] temp = URLs.get(i).split(">");
-		//			myButton[i] = new Button(this);
-		//			myButton[i].setText(temp[1]);
-		//			scrViewButLay.addView(myButton[i]);
-		//			ButtonOnClickListener boc = new ButtonOnClickListener(this,RetreiveDataActivity.class,temp[0],temp[1],address,type);
-		//			myButton[i].setOnClickListener(boc);	
 	}
 
+
+
+	public SimpleDateFormat chooseDateFormat(){
+		if(period.equals("Week"))
+			return new SimpleDateFormat("\nyyyy/MM/dd\nHH");
+		else if(period.equals("Month"))
+			return new SimpleDateFormat("yyyy/MM/dd");
+		else
+			return new SimpleDateFormat("HH:mm");
+	}
 
 	// display current date both on the text view and the Date Picker when the application starts.
 	public void setCurrentDate() {
@@ -228,21 +239,11 @@ public class ThirdActivity extends ActivityWithCallBack{
 			String strMonth = String.format("%02d",month+1);
 			String date = year+"/"+strMonth+"/"+day+" 00:00:00";
 			String value = ((Spinner)findViewById(R.id.spinnerValue)).getSelectedItem().toString();
-			String period = ((Spinner)findViewById(R.id.spinnerPeriod)).getSelectedItem().toString();
+			period = ((Spinner)findViewById(R.id.spinnerPeriod)).getSelectedItem().toString();
 			Download download = new Download(activityWithCallBack, URL, date,value,period, address);
 			download.execute();
 		}
 
-	}
-
-	public static double parseDoubleSafely(String str) {
-		double result = 0;
-		try {
-			result = Double.parseDouble(str);
-		} catch (NullPointerException npe) {
-		} catch (NumberFormatException nfe) {
-		}
-		return result;
 	}
 
 }
