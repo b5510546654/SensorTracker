@@ -2,13 +2,15 @@ package com.example.sensortracker;
 
 import java.util.ArrayList;
 
-import com.example.sensortracker.code.DBHelper;
-
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.example.sensortracker.code.DBHelper;
 
 public abstract class ActivityWithCallBack extends Activity {
 
@@ -21,8 +23,16 @@ public abstract class ActivityWithCallBack extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			DBHelper dbhelper = DBHelper.getInstance(this);
-			dbhelper.clear();
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("Do you really want to clear cache?").setTitle("Confirmation");
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+			    public void onClick(DialogInterface dialog, int whichButton) {
+//			        Toast.makeText(ActivityWithCallBack.this, "Yaay", Toast.LENGTH_SHORT).show();
+					DBHelper dbhelper = DBHelper.getInstance(ActivityWithCallBack.this);
+					dbhelper.clear();
+			    }}).setNegativeButton(android.R.string.no, null).show();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

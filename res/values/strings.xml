@@ -24,20 +24,20 @@
         <item>AD1</item>
         <item>AD2</item>
         <item>AD3</item>
-        <item>DIO</item>
         <item>V</item>
         <item>TP</item>
         <item>RSSI</item>
+<!--         <item>DIO</item>
         <item>CH-A</item>
         <item>CH-B</item>
-    </string-array>
+ -->    </string-array>
     
     <string-array name="view_by_list">
         <item>Choose a period</item>
         <item>Date</item>
         <item>Week</item>
         <item>Month</item>
-        <item>Year</item>
+ <!--        <item>Year</item> -->
     </string-array>
         <string name="ClearData">Clear Data</string>
 

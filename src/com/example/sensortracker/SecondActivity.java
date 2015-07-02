@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.example.sensortracker.code.*;
+import com.example.sensortracker.code.Connect;
+import com.example.sensortracker.code.ConnectSec;
 public class SecondActivity extends ActivityWithCallBack {
 	private String URL ;
 	private String address;
@@ -18,7 +18,7 @@ public class SecondActivity extends ActivityWithCallBack {
 		URL = getIntent().getExtras().getString("url");
 		Log.d("URL","from sec : "+URL);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main_activity2);
+		setContentView(R.layout.activity_second);
 		searchView();
 		Connect connect = new ConnectSec(this,URL);
 		connect.execute();
@@ -26,7 +26,7 @@ public class SecondActivity extends ActivityWithCallBack {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main_activity2, menu);
+		getMenuInflater().inflate(R.menu.main_second, menu);
 		return true;
 	}
 

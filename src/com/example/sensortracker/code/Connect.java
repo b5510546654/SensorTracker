@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.example.sensortracker.ActivityWithCallBack;
-
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+
+import com.example.sensortracker.ActivityWithCallBack;
 
 public abstract class Connect extends AsyncTask<String, Integer, ArrayList<String>> {
 

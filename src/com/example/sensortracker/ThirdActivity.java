@@ -7,34 +7,27 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import android.R.integer;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.sensortracker.code.*;
+import com.example.sensortracker.code.Download;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.PointsGraphSeries;
 public class ThirdActivity extends ActivityWithCallBack{
 	private String URL ;
 	private String address;
 
 	private TextView text_date;
-	private DatePicker date_picker;
 	private Button button;
 	private Button buttonGetData;
 
@@ -64,16 +57,11 @@ public class ThirdActivity extends ActivityWithCallBack{
 
 	@Override
 	public void callBack(ArrayList<String> URLs) {
-		//		setContentView(R.layout.activity_third);
-		//		TextView textView = (TextView)findViewById(R.id.TextView01);
-		//		textView.setText("");
-		//		for(int i = 0;i<sensors.size();i++){
-		//			textView.append(sensors.get(i)+"\n");
-		//		}
+		if(URLs.isEmpty())
+			return;
 		GraphView graph = (GraphView) findViewById(R.id.graph);
 		graph.removeAllSeries();
 		DataPoint[] datapoint = new DataPoint[URLs.size()];
-		String [] tm = URLs.get(0).split(">");
 		List<Date> dates = new ArrayList<Date>();
 		List<DataPoint[]> datapoints = new ArrayList<DataPoint[]>();
 		Date before = null;
@@ -147,11 +135,11 @@ public class ThirdActivity extends ActivityWithCallBack{
 
 	public SimpleDateFormat chooseDateFormat(){
 		if(period.equals("Week"))
-			return new SimpleDateFormat("\nyyyy/MM/dd\nHH");
+			return new SimpleDateFormat("yyyy/MM/dd\nHH");
 		else if(period.equals("Month"))
 			return new SimpleDateFormat("yyyy/MM/dd");
 		else
-			return new SimpleDateFormat("HH:mm");
+			return new SimpleDateFormat("HH");
 	}
 
 	// display current date both on the text view and the Date Picker when the application starts.
@@ -237,7 +225,8 @@ public class ThirdActivity extends ActivityWithCallBack{
 		@Override
 		public void onClick(View v) {
 			String strMonth = String.format("%02d",month+1);
-			String date = year+"/"+strMonth+"/"+day+" 00:00:00";
+			String strDay = String.format("%02d",day);
+			String date = year+"/"+strMonth+"/"+strDay+" 00:00:00";
 			String value = ((Spinner)findViewById(R.id.spinnerValue)).getSelectedItem().toString();
 			period = ((Spinner)findViewById(R.id.spinnerPeriod)).getSelectedItem().toString();
 			Download download = new Download(activityWithCallBack, URL, date,value,period, address);

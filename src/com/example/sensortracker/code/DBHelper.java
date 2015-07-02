@@ -10,7 +10,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -54,65 +53,34 @@ public class DBHelper extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	//	public List<Sensor> getSensor(String time) {
-	//		Log.d("sensor","get sensor");
-	//		List<Sensor> sensors = new ArrayList<Sensor>();
-	//		sqLiteDatabase = this.getWritableDatabase();
-	//		String sql;
-	//		if(time == null)
-	//			sql = String.format("select * from sensor where sensor.address = '%s' and sensor.type = '%s'",address,type);
-	//		else
-	//			sql = String.format("select * from sensor where sensor.address = '%s' and sensor.type = '%s' and sensor.datetime = '%s'",address,type,time);
-	//		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
-	//		if (cursor != null) {
-	//			cursor.moveToFirst();
-	//		}
-	//
-	//		while(!cursor.isAfterLast()) {
-	//			//sensor attribute
-	//			Sensor sensor = new Sensor(new Date (cursor.getString(1)), cursor.getString(2), cursor.getString(3), cursor.getString(4), 
-	//					cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8), cursor.getString(9),cursor.getString(10), cursor.getString(11),cursor.getString(12));
-	//			sensors.add(sensor);
-	//
-	//			cursor.moveToNext();
-	//		}
-	//		sqLiteDatabase.close();
-	//
-	//		return sensors;
-	//	}
-	//
-	private List<ReturnObject> getSensor(String value,String from,String to,String str) {
-//		Log.d("sensor","get sensor");
+	private List<ReturnObject> getResult(String value,String from,String to,String str) {
 		List<ReturnObject> ros = new ArrayList<ReturnObject>();
 		sqLiteDatabase = this.getWritableDatabase();
 		String sql;
 		String dateq = "";
 		if(str.equals("day"))
-			dateq = "%Y-%m-%d %H:%m:00";
+						dateq = "%Y-%m-%d %H:%m:00";
+//			dateq = "%Y-%m-%d %H:%m:%S";
+
 		else if(str.equals("week"))
-			dateq = "%Y-%m-%d %H:%m:00";
+						dateq = "%Y-%m-%d %H:%m:00";
+//			dateq = "%Y-%m-%d %H:%m:%s";
+
 		else
-			//			dateq = "%Y-%m-%d 00:00:00";
-			dateq = "%Y-%m-%d %H:00:00";
+						dateq = "%Y-%m-%d %H:00:00";
+//			dateq = "%Y-%m-%d %H:%m:%s";
 
 		sql = String.format("select strftime('%s',sensor.datetime) as date,avg(%s) from sensor where sensor.address = '%s' and sensor.type = '%s' and (sensor.datetime between '%s' and '%s') group by date",dateq,value,address,type,from.replace("/","-"),to.replace("/","-"));
-//		Log.d("SQL",sql);
+		//Log.d("sql",sql);
 		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
 		if (cursor != null) {
 			cursor.moveToFirst();
 		}
 
 		while(!cursor.isAfterLast()) {
-			//sensor attribute
-			//			Log.d("cursor",cursor.toString());
-			//			Log.d("cursor",cursor.getString(0));
-			//			Log.d("cursor",cursor.getDouble(1)+"");
 			String z = cursor.getString(0).replace("-","/");
 			double y = cursor.getDouble(1);
 			ReturnObject ro = new ReturnObject(new Date(z), cursor.getDouble(1));
-			//			Sensor sensor = new Sensor(new Date (cursor.getString(1)), cursor.getString(2), cursor.getString(3), cursor.getString(4), 
-			//					cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8), cursor.getString(9),cursor.getString(10), cursor.getString(11),cursor.getString(12));
-			//			sensors.add(sensor);
 			ros.add(ro);
 			cursor.moveToNext();
 		}
@@ -126,7 +94,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		to.setTime(new Date(time));
 		Calendar from = (Calendar)to.clone();
 		to.add(Calendar.DATE, 1);
-		return getSensor(value,sdf.format(from.getTime()), sdf.format(to.getTime()),"day");
+		return getResult(value,sdf.format(from.getTime()), sdf.format(to.getTime()),"day");
 	}
 
 	public List<ReturnObject> getByWeek(String value,String time){
@@ -142,7 +110,7 @@ public class DBHelper extends SQLiteOpenHelper {
 			from.add(Calendar.DATE,-7);
 		to.add(Calendar.DATE, 1);
 		from.add(Calendar.DATE, 1);
-		return getSensor(value,sdf.format(from.getTime()), sdf.format(to.getTime()),"week");
+		return getResult(value,sdf.format(from.getTime()), sdf.format(to.getTime()),"week");
 	}
 	public List<ReturnObject> getByMonth(String value,String time){
 		Calendar to = Calendar.getInstance();
@@ -155,7 +123,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		from.set(Calendar.DATE,1);
 		to.add(Calendar.MONTH, 1);
 		to.set(Calendar.DATE, 1);
-		return getSensor(value,sdf.format(from.getTime()), sdf.format(to.getTime()),"month");
+		return getResult(value,sdf.format(from.getTime()), sdf.format(to.getTime()),"month");
 	}
 
 	public List<Date> getTime(String from,String to) {
@@ -163,6 +131,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		sqLiteDatabase = this.getWritableDatabase();
 		String sql;
 		sql = String.format("select strftime('%%Y-%%m-%%d 00:00:00',sensor.datetime) as date from sensor where sensor.address = '%s' and sensor.type = '%s' and sensor.datetime between '%s' and '%s' group by date",address,type,from.replace("/","-"),to.replace("/","-"));
+		//Log.d("sql",sql);
 		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
 		if (cursor != null) {
 			cursor.moveToFirst();
@@ -179,7 +148,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		return times;
 	}
 	public void addSensor(Sensor sensor){
-		//		Log.d("Sensor",sensor.toString());
+		//Log.d("Sensor",sensor.toString());
 		String sql = String.format("insert into sensor (datetime,address,ip,type,ad0,ad1,ad2,ad3,DIO,V,TP,RSSI)values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')", sdf.format(sensor.getDatetime()).replace("/", "-"),sensor.getAddress(),sensor.getIp(),sensor.getType(),sensor.getAd0(),sensor.getAd1(),sensor.getAd2(),sensor.getAd3(),sensor.getDIO(),sensor.getV(),sensor.getTP(),sensor.getRSSI());
 		sqLiteDatabase = this.getWritableDatabase();
 		sqLiteDatabase.execSQL(sql);
@@ -196,7 +165,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		String like = time.replace("/", "-")+"%";
 		sqLiteDatabase = this.getWritableDatabase();
 		String sql = String.format("select max(datetime) from sensor where sensor.address = '%s' and sensor.type = '%s' and sensor.datetime like '%s'",address,type,like);
-//		Log.d("sql",sql);
+		//		Log.d("sql",sql);
 		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
 		if (cursor != null) {
 			cursor.moveToFirst();
@@ -204,14 +173,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
 		while(!cursor.isAfterLast()) {
 			//sensor attribute
-//			Log.d("cursor",cursor.getString(0).replace("-", "/"));
+			//			Log.d("cursor",cursor.getString(0).replace("-", "/"));
 			sqLiteDatabase.close();
 			return new Date(cursor.getString(0).replace("-", "/"));
 		}
 		sqLiteDatabase.close();
 		return null;
 	}
-	
+
 	public void deleteTime(String time){
 		sqLiteDatabase = this.getWritableDatabase();
 		String like = time.replace("/", "-")+"%";

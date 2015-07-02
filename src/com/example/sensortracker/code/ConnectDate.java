@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.example.sensortracker.ActivityWithCallBack;
-import com.example.sensortracker.ThirdActivity;
-
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.example.sensortracker.ActivityWithCallBack;
+import com.example.sensortracker.ThirdActivity;
 
 public class ConnectDate extends AsyncTask<String, Integer, ArrayList<String>> {
 
@@ -23,7 +23,6 @@ public class ConnectDate extends AsyncTask<String, Integer, ArrayList<String>> {
 	private final static String link = "http://ime.ist.hokudai.ac.jp/~yamamoto/xbee/xbee-download-by-day.cgi?";
 	private ThirdActivity activity;
 	private static	ArrayList<String> ret;
-	private String type;
 	public static ArrayList<String> getURLandName(String str) {
 //		Log.d("title","in getURLandNAme");
 		ret = new ArrayList<String>();
@@ -74,7 +73,7 @@ public class ConnectDate extends AsyncTask<String, Integer, ArrayList<String>> {
 			temp += inputLine;
 		}
 		in.close();
-		type = getType(temp);
+		getType(temp);
 		return getURLandName(temp);	
 		}
 		catch(Exception e){

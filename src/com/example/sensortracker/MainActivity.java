@@ -1,13 +1,13 @@
 package com.example.sensortracker;
 
 import java.util.ArrayList;
+
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.example.sensortracker.code.*;
+import com.example.sensortracker.code.ConnectMain;
 public class MainActivity extends ActivityWithCallBack {
 	private final String URL = "http://ime.ist.hokudai.ac.jp/~yamamoto/xbee/xbee-coordinators.cgi";
 	@Override

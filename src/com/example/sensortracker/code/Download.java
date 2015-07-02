@@ -3,7 +3,6 @@ package com.example.sensortracker.code;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
@@ -17,16 +16,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.example.sensortracker.ActivityWithCallBack;
-
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.util.Log;
+
+import com.example.sensortracker.ActivityWithCallBack;
 
 public class Download extends AsyncTask<String, Integer, String> {
 
 	protected ProgressDialog loading;
-	private final String URL;
 	private ActivityWithCallBack activity;
 	private ArrayList<String> ret;
 	DBHelper dbHelper;
@@ -47,7 +44,6 @@ public class Download extends AsyncTask<String, Integer, String> {
 		loading.setMessage("loading ... ");
 		loading.setCancelable(false);
 		loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		this.URL = URL;
 		this.time = time;
 		this.activity = activityWithCallBack;
 		this.address = address;
@@ -58,7 +54,7 @@ public class Download extends AsyncTask<String, Integer, String> {
 
 	public void getLastDate(String str,String time){
 		String [] temp = time.split(" ");
-		String reg = "    <TD> (\\d\\d:\\d\\d:\\d\\d) </TD><TD ALIGN=RIGHT><A href=\"http://ime.ist.hokudai.ac.jp/~yamamoto/xbee/xbee-sensordata.cgi\\?"+sensor+"&ymd="+temp[0];
+		String reg = "    <TD> (([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]) </TD><TD ALIGN=RIGHT><A href=\"http://ime.ist.hokudai.ac.jp/~yamamoto/xbee/xbee-sensordata.cgi\\?"+sensor+"&ymd="+temp[0];
 		//		String reg = "<TR><TD> "+temp[0]+" </TD>\n    <TD> (.*?) </TD>";
 //		Log.d("time",temp[0]);
 //		Log.d("reg",reg);
@@ -209,7 +205,6 @@ public class Download extends AsyncTask<String, Integer, String> {
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					yc.getInputStream()));
 			String inputLine;
-			String temp = "";
 			while ((inputLine = in.readLine()) != null) {
 				String[] str = inputLine.split(",");
 				Date date = new Date(str[0]+","+str[1]);
@@ -257,6 +252,10 @@ public class Download extends AsyncTask<String, Integer, String> {
 			from.set(Calendar.DATE,1);
 			to.add(Calendar.MONTH, 1);
 			to.set(Calendar.DATE, 1);		
+		}
+		else{
+			from = (Calendar)to.clone();
+			to.add(Calendar.DATE, 1);
 		}
 		Calendar[] retc = {from,to};
 		return retc;
