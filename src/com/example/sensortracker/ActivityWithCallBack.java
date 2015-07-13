@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.sensortracker.code.DBHelper;
+import com.example.sensortracker.controller.DBHelper;
 
 public abstract class ActivityWithCallBack extends Activity {
 

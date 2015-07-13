@@ -1,4 +1,4 @@
-package com.example.sensortracker.code;
+package com.example.sensortracker.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -6,10 +6,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import com.example.sensortracker.model.ReturnObject;
+import com.example.sensortracker.model.Sensor;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -67,7 +71,7 @@ public class DBHelper extends SQLiteOpenHelper {
 //			dateq = "%Y-%m-%d %H:%m:%s";
 
 		else
-						dateq = "%Y-%m-%d %H:00:00";
+						dateq = "%Y-%m-%d";
 //			dateq = "%Y-%m-%d %H:%m:%s";
 
 		sql = String.format("select strftime('%s',sensor.datetime) as date,avg(%s) from sensor where sensor.address = '%s' and sensor.type = '%s' and (sensor.datetime between '%s' and '%s') group by date",dateq,value,address,type,from.replace("/","-"),to.replace("/","-"));
@@ -78,6 +82,8 @@ public class DBHelper extends SQLiteOpenHelper {
 		}
 
 		while(!cursor.isAfterLast()) {
+//			Log.d("cursor",cursor.getString(0));
+//			Log.d("cursor",cursor.getDouble(1)+"");
 			String z = cursor.getString(0).replace("-","/");
 			double y = cursor.getDouble(1);
 			ReturnObject ro = new ReturnObject(new Date(z), cursor.getDouble(1));

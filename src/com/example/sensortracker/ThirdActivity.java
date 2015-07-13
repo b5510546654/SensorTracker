@@ -10,6 +10,7 @@ import java.util.List;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,12 +18,16 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.sensortracker.code.Download;
+import com.example.sensortracker.controller.Download;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 public class ThirdActivity extends ActivityWithCallBack{
 	private String URL ;
 	private String address;
@@ -59,6 +64,8 @@ public class ThirdActivity extends ActivityWithCallBack{
 	public void callBack(ArrayList<String> URLs) {
 		if(URLs.isEmpty())
 			return;
+		if(URLs.size() == 1)
+			URLs.add(URLs.get(0));
 		GraphView graph = (GraphView) findViewById(R.id.graph);
 		graph.removeAllSeries();
 		DataPoint[] datapoint = new DataPoint[URLs.size()];
@@ -74,18 +81,20 @@ public class ThirdActivity extends ActivityWithCallBack{
 			if(before != null && date.getTime() - before.getTime() > 24*60*60*1000){
 				counter.add(0);
 				runner++;
-//				Log.d("runner",runner+"");
+				//				Log.d("runner",runner+"");
 			}
 			counter.set(runner, counter.get(runner)+1);
 			before = date;
 		}
+		List<Double> yValues = new ArrayList<Double>();
 		for(int i = 0;i<URLs.size();i++){
 			String [] temp = URLs.get(i).split(">");
 			Date date = new Date(temp[0]);
 			datapoint[i] = new DataPoint(date,Double.parseDouble(temp[1]));
 			dates.add(date);
+			yValues.add(Double.parseDouble(temp[1]));
 		}
-		
+
 		int count = counter.get(0);
 		int a = 0;
 		int b = 1;
@@ -105,29 +114,44 @@ public class ThirdActivity extends ActivityWithCallBack{
 			}
 			if(i == URLs.size()-1)
 				datapoints.add(dtemp);
-//			Log.d("abc",a+" "+b+" "+count);
+//						Log.d("abc",a+" "+b+" "+count);
 		}
-		
-//		Log.d("URL",URLs.size()+"");
-//		LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoint);
+
+//				Log.d("URL",URLs.size()+"");
+		//		LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoint);
+
 		graph.getViewport().setMinX(Collections.min(dates).getTime());
 		graph.getViewport().setMaxX(Collections.max(dates).getTime());
 		graph.getViewport().setXAxisBoundsManual(true);
+//		graph.getViewport().setMinY(Math.round(Collections.min(yValues)*100.0)/100);
+//		graph.getViewport().setMaxY(Math.round(Collections.max(yValues)*100.0)/100);
+//		graph.getViewport().setYAxisBoundsManual(true);
 		graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
 			@Override
 			public String formatLabel(double value,boolean isValueX){
 				if(isValueX)
 					return chooseDateFormat().format(new Date((long) value));
 				else
-					return value+"";
+					return super.formatLabel(value, isValueX);//value+"";
 			}
 
 		});
-//		graph.addSeries(series);
+
+		//		graph.addSeries(series);
 		for(int i = 0;i<datapoints.size();i++){
 			LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoints.get(i));
+			series.setOnDataPointTapListener(new OnDataPointTapListener() {
+
+				@Override
+				public void onTap(Series arg0, DataPointInterface arg1) {
+					String x = new SimpleDateFormat("yyyy/MM/dd HH").format(new Date((long) arg1.getX()));
+					String y = String.format("%.2f", arg1.getY());
+					Toast.makeText(ThirdActivity.this, "Data Point\nDate  : "+x+"\nValue : "+y, Toast.LENGTH_SHORT).show();					
+				}
+			}); 
 			graph.addSeries(series);
 		}
+		graph.getGridLabelRenderer().setLabelsSpace(20);
 		graph.setVisibility(GraphView.VISIBLE);
 	}
 
@@ -230,7 +254,7 @@ public class ThirdActivity extends ActivityWithCallBack{
 			String value = ((Spinner)findViewById(R.id.spinnerValue)).getSelectedItem().toString();
 			period = ((Spinner)findViewById(R.id.spinnerPeriod)).getSelectedItem().toString();
 			Download download = new Download(activityWithCallBack, URL, date,value,period, address);
-			download.execute();
+			download.execute();				
 		}
 
 	}

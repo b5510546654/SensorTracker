@@ -1,4 +1,4 @@
-package com.example.sensortracker.code;
+package com.example.sensortracker.controller;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

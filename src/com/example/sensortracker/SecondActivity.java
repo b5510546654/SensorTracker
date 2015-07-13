@@ -8,8 +8,8 @@ import android.view.Menu;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.example.sensortracker.code.Connect;
-import com.example.sensortracker.code.ConnectSec;
+import com.example.sensortracker.controller.Connect;
+import com.example.sensortracker.controller.ConnectSec;
 public class SecondActivity extends ActivityWithCallBack {
 	private String URL ;
 	private String address;

@@ -1,4 +1,4 @@
-package com.example.sensortracker.code;
+package com.example.sensortracker.model;
 
 import java.util.Date;
 

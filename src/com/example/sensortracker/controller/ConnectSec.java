@@ -1,4 +1,4 @@
-package com.example.sensortracker.code;
+package com.example.sensortracker.controller;
 
 import java.util.ArrayList;
 

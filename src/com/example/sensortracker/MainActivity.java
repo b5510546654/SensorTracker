@@ -7,7 +7,7 @@ import android.view.Menu;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.example.sensortracker.code.ConnectMain;
+import com.example.sensortracker.controller.ConnectMain;
 public class MainActivity extends ActivityWithCallBack {
 	private final String URL = "http://ime.ist.hokudai.ac.jp/~yamamoto/xbee/xbee-coordinators.cgi";
 	@Override
