@@ -10,9 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,9 +37,10 @@ public class Download extends AsyncTask<String, Integer, String> {
 	private String time;	
 	private String value;
 	private String period;
-	private Map<String,String> map;
+	private Date lastUpdate;
 	private int checker;
-	public Download(ActivityWithCallBack activityWithCallBack,String URL,String time,String value,String period, String address){
+	private String sensorName;
+	public Download(ActivityWithCallBack activityWithCallBack,String URL,String time,String value,String period, String address,String type,Date lastUpdate,String sensorName){
 		loading = new ProgressDialog(activityWithCallBack);
 		loading.setTitle("Sensor");
 		loading.setMessage("loading ... ");
@@ -52,59 +51,45 @@ public class Download extends AsyncTask<String, Integer, String> {
 		this.address = address;
 		this.value = value;
 		this.period = period;
+		this.type = type;
+		this.lastUpdate = lastUpdate;
+		this.sensorName = sensorName;
 		sensor = URL.substring(URL.indexOf("addr="));
+//		Log.d("sensor",sensor);
+//		Log.d("sensorName",sensorName);
 	}
 
 	private void connect(String time){
-		Treadconnect treadconnect = new Treadconnect(time, link, sensor, dbHelper,this);
+		Treadconnect treadconnect = new Treadconnect(time, link, sensor, dbHelper,sensorName,this);
 		treadconnect.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		checker += 1;
-//		Log.d("counter","connect "+checker);
 	}
 
 	private void day(Calendar from,Calendar to) {
-		Calendar now = Calendar.getInstance();
-		List<Date> getTime = dbHelper.getTime(sdf.format(from.getTime()), sdf.format(to.getTime()));
-		//		for (Date date : getTime) {
-		//			Log.d("date",""+sdf.format(date.getTime()));
-		//		}
-		if(!getTime.contains(from.getTime())){
+		String temp = time.split(" ")[0];
+		Date timedb = dbHelper.maxTime(temp);
+		if(dbHelper.isCompleted(from));
+		else if(timedb == null || timedb.getTime() < lastUpdate.getTime()){
 			connect(time);
-		}
-		else{
-			String temp = time.split(" ")[0];
-			Date lasttime = new Date(temp+" "+map.get(temp));
-			Date timedb = dbHelper.maxTime(temp);
-			if(timedb.getTime() < lasttime.getTime()){
-				dbHelper.deleteTime(temp);
-				connect(time);
-			}
+			dbHelper.updateFinishTable(from);
 		}
 		if(checker == 0)
 			finish();
-		//		ros = dbHelper.getByDay(valueToString(value),time);
 	}
 
 	@Override
 	protected String doInBackground(String... s) {
 		Calendar[] minmax = minmaxDate();
-		map = new HashMap<String, String>();
 		checker = 0;
-		try {
-			getTypeDate(minmax[0],minmax[1]);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		ret = new ArrayList<String>();
-		dbHelper = DBHelper.getInstance(activity,address,type);
+		dbHelper = DBHelper.getInstance(activity,address,type,sensorName);
 		ros = new ArrayList<ReturnObject>();
 		selectByPeriod(minmax[0],minmax[1]);
 		try {
 			if(checker > 0)
-			synchronized( this ) {
-				wait();
-			}
+				synchronized( this ) {
+					wait();
+				}
 		} catch (InterruptedException e) {
 			return null;
 		}			
@@ -127,63 +112,15 @@ public class Download extends AsyncTask<String, Integer, String> {
 		}
 		synchronized( this ){
 			this.notifyAll();
-//			Log.d("notify","notify");
 		}
 	}
 
 	void finishConnect(){
 		checker -= 1;
-		Log.d("counter","finish  "+checker);
+//		Log.d("counter","finish  "+checker);
 		if(checker <= 0){
 			finish();
 		}
-	}
-
-	public void getLastDate(String str){//,String time){
-//		String [] temp = time.split(" ");
-		String reg = "<TD> ([1-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]) </TD>    <TD> (([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]) </TD>";
-//		String reg = "    <TD> (([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]) </TD><TD ALIGN=RIGHT><A href=\"http://ime.ist.hokudai.ac.jp/~yamamoto/xbee/xbee-sensordata.cgi\\?"+sensor+"&ymd="+temp[0];
-		//		String reg = "<TR><TD> "+temp[0]+" </TD>\n    <TD> (.*?) </TD>";
-		//		Log.d("time",temp[0]);
-		//		Log.d("reg",reg);
-		Pattern pattern = Pattern.compile(reg);
-		Matcher matcher = pattern.matcher(str);
-		while (matcher.find()) {
-			//			Log.d("matcher",matcher.group(1));
-//			map.put(temp[0],matcher.group(1));
-			map.put(matcher.group(1), matcher.group(2));
-//			return;
-		}
-		return ;
-	}
-
-	public String getType(String str){
-		Pattern pattern = Pattern.compile(", Type: (.*?)<BR>");
-		Matcher matcher = pattern.matcher(str);
-		while (matcher.find()) {
-			return matcher.group(1);
-		}
-		return null;
-	}
-
-	public void getTypeDate(Calendar from,Calendar to) throws IOException{
-		URL oracle = new URL("http://ime.ist.hokudai.ac.jp/~yamamoto/xbee/xbee-sensor.cgi?"+sensor);
-		URLConnection yc = oracle.openConnection();
-		BufferedReader in = new BufferedReader(new InputStreamReader(
-				yc.getInputStream()));
-		String inputLine;
-		String temp = "";
-		while ((inputLine = in.readLine()) != null) {
-			temp += inputLine;
-		}
-		in.close();
-		
-//		type = getType(temp);
-//		Calendar run = (Calendar)from.clone();
-//		while(run.getTimeInMillis() < to.getTimeInMillis()){
-			getLastDate(temp);//,sdf.format(run.getTime()));
-//			run.add(Calendar.DATE,1);
-//		}
 	}
 
 	private Calendar[] minmaxDate(){
@@ -218,26 +155,15 @@ public class Download extends AsyncTask<String, Integer, String> {
 	}
 
 	private void month(Calendar from,Calendar to) {
-		Calendar now = Calendar.getInstance();
-		List<Date> getTime = dbHelper.getTime(sdf.format(from.getTime()),sdf.format(to.getTime()));
-		while(from.getTimeInMillis() < to.getTimeInMillis()){
-			if(!getTime.contains(from.getTime()) && from.getTimeInMillis() < now.getTimeInMillis())
-				connect(sdf.format(from.getTime()));
-			else if(from.getTimeInMillis() < now.getTimeInMillis()){
-				String temp = sdf.format(from.getTime()).split(" ")[0];
-				Date lasttime = new Date(temp+" "+map.get(temp));
-				Date timedb = dbHelper.maxTime(temp);
-				if(timedb.getTime() < lasttime.getTime()){
-					dbHelper.deleteTime(temp);
-					connect(sdf.format(from.getTime()));
-				}
-			}
-			from.add(Calendar.DATE,1);
+		String temp = sdf.format(from.getTime()).split(" ")[0];
+		Date timedb = dbHelper.maxTime(temp);
+		if(dbHelper.isCompleted(from));
+		else if(timedb == null || timedb.getTime() < lastUpdate.getTime()){
+			connect(sdf.format(from.getTime()));
+			dbHelper.updateFinishTable(from);
 		}
 		if(checker == 0)
 			finish();
-
-		//		ros = dbHelper.getByMonth(valueToString(value),time);
 	}
 
 
@@ -260,13 +186,11 @@ public class Download extends AsyncTask<String, Integer, String> {
 
 	public String valueToString(String str){
 		if(str.equals("address")) return "address";
-		if(str.equals("ip")) return "ip";
 		if(str.equals("type")) return "type";
 		if(str.equals("AD0")) return "ad0";
 		if(str.equals("AD1")) return "ad1";;
 		if(str.equals("AD2")) return "ad2";
 		if(str.equals("AD3")) return "ad3";
-		if(str.equals("DIO")) return "DIO";
 		if(str.equals("V")) return "V";
 		if(str.equals("TP")) return "TP";
 		if(str.equals("RSSI")) return "RSSI";
@@ -274,34 +198,35 @@ public class Download extends AsyncTask<String, Integer, String> {
 
 	}
 
-	private void week(Calendar from,Calendar to) {
-		Calendar now = Calendar.getInstance();
-		List<Date> getTime = dbHelper.getTime(sdf.format(from.getTime()),sdf.format(to.getTime()));
-		//		for (Date date : getTime) {
-		//			Log.d("date",""+sdf.format(date.getTime()));
-		//		}
-		while(from.getTimeInMillis() < to.getTimeInMillis()){
-			//			Log.d("from",sdf.format(from.getTime()));
-			if(!getTime.contains(from.getTime()) && from.getTimeInMillis() < now.getTimeInMillis()){
+	private void week(Calendar from,Calendar to){
+		int lmonth = lastUpdate.getMonth();
+		int fmonth = from.get(Calendar.MONTH);
+		if(lmonth == fmonth){
+			String temp = sdf.format(from.getTime()).split(" ")[0];
+			Date timedb = dbHelper.maxTime(temp);
+			if(dbHelper.isCompleted(from));
+			else if(timedb.getTime() < lastUpdate.getTime()){
 				connect(sdf.format(from.getTime()));
+				dbHelper.updateFinishTable(from);
 			}
-			else if(from.getTimeInMillis() < now.getTimeInMillis()){
-				String temp = sdf.format(from.getTime()).split(" ")[0];
-				//				Log.d("temp",sdf.format(from.getTime()).split(" ")[0]);
-				Date lasttime = new Date(temp+" "+map.get(temp));
-				Date timedb = dbHelper.maxTime(temp);
-				if(timedb.getTime() < lasttime.getTime()){
-					dbHelper.deleteTime(temp);
-					connect(sdf.format(from.getTime()));
-				}
+		}
+		else{
+			if(!dbHelper.isCompleted(from)){
+				connect(sdf.format(from.getTime()));
+				dbHelper.updateFinishTable(from);				
 			}
-			from.add(Calendar.DATE,1);
+			String temp = sdf.format(to.getTime()).split(" ")[0];
+			Date timedb = dbHelper.maxTime(temp);
+			if(dbHelper.isCompleted(to));
+			else if(timedb.getTime() < lastUpdate.getTime()){
+				connect(sdf.format(to.getTime()));
+				dbHelper.updateFinishTable(to);
+			}
 		}
 		if(checker == 0)
 			finish();
-
-		//		ros = dbHelper.getByWeek(valueToString(value),time);
 	}
+
 	@Override
 	protected void onPostExecute(String result) {
 		loading.dismiss();
@@ -315,35 +240,49 @@ class Treadconnect extends AsyncTask<String, Integer, String>{
 	private String sensor;
 	private DBHelper dbHelper;
 	private Download download;
-	public Treadconnect(String time,String link,String sensor,DBHelper dbHelper,Download download) {
+	private String sensorName;
+	public Treadconnect(String time,String link,String sensor,DBHelper dbHelper,String sensorName,Download download) {
 		this.time = time;
 		this.link = link;
 		this.sensor = sensor;
 		this.dbHelper = dbHelper;
+		this.sensorName = sensorName;
 		this.download = download;
 	}
 
 	private void connect(String time){
+		String[] ttime = time.split("/");
+		List<Sensor> sensorList = new ArrayList<Sensor>();
 		try{
-			URL oracle = new URL(link+sensor+"&ymd="+time);
+			URL oracle = new URL(link+sensor+"&ymd="+ttime[0]+"/"+ttime[1]+"/00");
 			URLConnection yc = oracle.openConnection();
-//			Log.d("oracle",oracle.toString());
+			//			Log.d("oracle",oracle.toString());
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					yc.getInputStream()));
 			String inputLine;
+
 			while ((inputLine = in.readLine()) != null) {
 				String[] str = inputLine.split(",");
 				Date date = new Date(str[0]+","+str[1]);
-				Sensor sensor = new Sensor(date,str[3],str[4],str[6],str[8],str[9],str[10],str[11],str[12],str[13],str[14],str[15]);
-				//				Log.d("sensor",sensor.toString());
-				dbHelper.addSensor(sensor);
+				double[] ad = transform(str[6],str[8],str[9],str[10],str[11]);
+				Sensor sensor = new Sensor(date,str[3],str[6],ad[0],ad[1],ad[2],ad[3],str[13],str[14],str[15]);
+				sensorList.add(sensor);
 			}
-			//						Log.d("ROS",ros.size()+"");
-//			Log.d("time",count2.getTimeInMillis()-count.getTimeInMillis()+"");
+			dbHelper.addSensorList(sensorList);
 			in.close();
 		}
 		catch(Exception e){
 		}
+	}
+
+	private double[] transform(String type,String ads0,String ads1,String ads2,String ads3){
+		double ad0 = Double.parseDouble(ads0),ad1 = Double.parseDouble(ads1),ad2 = Double.parseDouble(ads2),ad3 = Double.parseDouble(ads3);
+		double[] ad = new double[4];
+		ad[0] = Math.round((0.097781*ad0-0.14477));
+		ad[1] = Math.round((0.1178*ad1-0.00087));
+		ad[2] = (((ad2/1023.0) * 1200)-500)/10.0;
+		ad[3] = ad3;
+		return ad;
 	}
 
 	@Override

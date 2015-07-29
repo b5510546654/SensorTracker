@@ -12,27 +12,30 @@ public class ButtonOnClickListener implements OnClickListener {
 	private String address;
 	private String type;
 	private Class<?> nextClass;
-	private String time;
+	private String lastUpdate;
+	private String text;
 	/**
 	 * Constructor, use calling activity
 	 * @param activity calling activity
 	 */
-	public ButtonOnClickListener(Activity activity,Class<?> nextClass,String url,String time,String address,String type) {
+	public ButtonOnClickListener(Activity activity,Class<?> nextClass,String url,String address,String type,String lastUpdate,String text) {
 		this.activity = activity;
 		this.nextClass = nextClass;
 		this.url = url;
-		this.time = time;
 		this.address = address;
 		this.type = type;
+		this.lastUpdate = lastUpdate;
+		this.text = text;
 	}
 
 	@Override
 	public void onClick(View v) {
 		Intent intent = new Intent(activity.getApplicationContext(), nextClass);
 		intent.putExtra("url", url);
-		intent.putExtra("time", time);
 		intent.putExtra("address", address);
 		intent.putExtra("type", type);
+		intent.putExtra("text", text);
+		intent.putExtra("lastUpdate", lastUpdate);
 
 		activity.startActivity(intent);
 	}

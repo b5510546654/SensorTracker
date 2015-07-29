@@ -31,6 +31,8 @@ import com.jjoe64.graphview.series.Series;
 public class ThirdActivity extends ActivityWithCallBack{
 	private String URL ;
 	private String address;
+	private Date lastUpdate;
+	private String type;
 
 	private TextView text_date;
 	private Button button;
@@ -41,15 +43,19 @@ public class ThirdActivity extends ActivityWithCallBack{
 	private int day;
 	static final int DATE_DIALOG_ID = 100;
 	private String period;
+	private Calendar calendar;
+	private String sensorName;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		URL = getIntent().getExtras().getString("url");
 		address = getIntent().getExtras().getString("address");
+		type = getIntent().getExtras().getString("type");
+		lastUpdate = new Date(getIntent().getExtras().getString("lastUpdate"));
+		sensorName = getIntent().getExtras().getString("text");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_third);
-		//		ConnectDate connect = new ConnectDate(this,URL,address);
-		//		connect.execute();
-
+		TextView textView = (TextView)findViewById(R.id.TextView01);
+		textView.setText("Sensor ID : "+sensorName);
 		setCurrentDate();
 		addButtonListener();
 	}
@@ -62,12 +68,16 @@ public class ThirdActivity extends ActivityWithCallBack{
 
 	@Override
 	public void callBack(ArrayList<String> URLs) {
-		if(URLs.isEmpty())
-			return;
-		if(URLs.size() == 1)
-			URLs.add(URLs.get(0));
 		GraphView graph = (GraphView) findViewById(R.id.graph);
 		graph.removeAllSeries();
+		if(URLs.isEmpty()){
+			graph.setVisibility(GraphView.INVISIBLE);
+			noData();
+			return;
+		}
+		if(URLs.size() == 1)
+			URLs.add(URLs.get(0));
+		
 		DataPoint[] datapoint = new DataPoint[URLs.size()];
 		List<Date> dates = new ArrayList<Date>();
 		List<DataPoint[]> datapoints = new ArrayList<DataPoint[]>();
@@ -114,18 +124,12 @@ public class ThirdActivity extends ActivityWithCallBack{
 			}
 			if(i == URLs.size()-1)
 				datapoints.add(dtemp);
-//						Log.d("abc",a+" "+b+" "+count);
 		}
 
-//				Log.d("URL",URLs.size()+"");
-		//		LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoint);
 
 		graph.getViewport().setMinX(Collections.min(dates).getTime());
 		graph.getViewport().setMaxX(Collections.max(dates).getTime());
 		graph.getViewport().setXAxisBoundsManual(true);
-//		graph.getViewport().setMinY(Math.round(Collections.min(yValues)*100.0)/100);
-//		graph.getViewport().setMaxY(Math.round(Collections.max(yValues)*100.0)/100);
-//		graph.getViewport().setYAxisBoundsManual(true);
 		graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
 			@Override
 			public String formatLabel(double value,boolean isValueX){
@@ -137,7 +141,6 @@ public class ThirdActivity extends ActivityWithCallBack{
 
 		});
 
-		//		graph.addSeries(series);
 		for(int i = 0;i<datapoints.size();i++){
 			LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(datapoints.get(i));
 			series.setOnDataPointTapListener(new OnDataPointTapListener() {
@@ -153,9 +156,13 @@ public class ThirdActivity extends ActivityWithCallBack{
 		}
 		graph.getGridLabelRenderer().setLabelsSpace(20);
 		graph.setVisibility(GraphView.VISIBLE);
+//		Log.d("Time",Calendar.getInstance().getTimeInMillis() - calendar.getTimeInMillis()+"");
 	}
 
-
+	private void noData() {
+		Toast.makeText(getApplicationContext(), "No data available. or Connection lost.",
+				   Toast.LENGTH_LONG).show();
+	}
 
 	public SimpleDateFormat chooseDateFormat(){
 		if(period.equals("Week"))
@@ -253,8 +260,9 @@ public class ThirdActivity extends ActivityWithCallBack{
 			String date = year+"/"+strMonth+"/"+strDay+" 00:00:00";
 			String value = ((Spinner)findViewById(R.id.spinnerValue)).getSelectedItem().toString();
 			period = ((Spinner)findViewById(R.id.spinnerPeriod)).getSelectedItem().toString();
-			Download download = new Download(activityWithCallBack, URL, date,value,period, address);
-			download.execute();				
+			Download download = new Download(activityWithCallBack, URL, date,value,period, address,type,lastUpdate,sensorName);
+			download.execute();
+			calendar = Calendar.getInstance();
 		}
 
 	}

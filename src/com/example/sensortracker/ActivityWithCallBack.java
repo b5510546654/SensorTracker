@@ -29,7 +29,6 @@ public abstract class ActivityWithCallBack extends Activity {
 			builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
 			    public void onClick(DialogInterface dialog, int whichButton) {
-//			        Toast.makeText(ActivityWithCallBack.this, "Yaay", Toast.LENGTH_SHORT).show();
 					DBHelper dbhelper = DBHelper.getInstance(ActivityWithCallBack.this);
 					dbhelper.clear();
 			    }}).setNegativeButton(android.R.string.no, null).show();

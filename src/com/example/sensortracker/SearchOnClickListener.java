@@ -18,6 +18,4 @@ public class SearchOnClickListener implements OnClickListener {
 	public void onClick(View v) {
 		activityWithCallBack.filter(text.getText().toString());
 	}
-
-
 }

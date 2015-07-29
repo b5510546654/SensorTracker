@@ -38,7 +38,7 @@ public class MainActivity extends ActivityWithCallBack {
 			myButton[i] = new Button(this);
 			myButton[i].setText(temp[1]);
 			scrViewButLay.addView(myButton[i]);
-			ButtonOnClickListener boc = new ButtonOnClickListener(this,SecondActivity.class,temp[0].substring(1,temp[0].length()-2),null,null,null);
+			ButtonOnClickListener boc = new ButtonOnClickListener(this,SecondActivity.class,temp[0].substring(1,temp[0].length()-2),null,null,null,temp[1]);
 			myButton[i].setOnClickListener(boc);
 		}
 	}

@@ -19,7 +19,8 @@ public abstract class Connect extends AsyncTask<String, Integer, ArrayList<Strin
 	private final String URL;
 	private static ArrayList<String> ret;
 	private ActivityWithCallBack activity;
-	public static ArrayList<String> getURLandName(String str) {
+	
+	public ArrayList<String> getURLandName(String str) {
 		ArrayList<String> ans = new ArrayList<String>();
 		Pattern pattern = Pattern.compile("<TD><A href=(.*?)</A>");
 	    Matcher matcher = pattern.matcher(str);
