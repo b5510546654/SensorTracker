@@ -10,12 +10,14 @@ import java.util.List;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,6 +60,14 @@ public class ThirdActivity extends ActivityWithCallBack{
 		textView.setText("Sensor ID : "+sensorName);
 		setCurrentDate();
 		addButtonListener();
+
+		
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+		int height = displaymetrics.heightPixels;
+		int width = displaymetrics.widthPixels;
+		LinearLayout rLGreen = ((LinearLayout) findViewById(R.id.graphLayout));
+		rLGreen.setLayoutParams(new LinearLayout.LayoutParams((int) (height*0.6), width));
 	}
 
 	@Override
@@ -155,6 +165,8 @@ public class ThirdActivity extends ActivityWithCallBack{
 			graph.addSeries(series);
 		}
 		graph.getGridLabelRenderer().setLabelsSpace(20);
+		graph.getViewport().setScrollable(true);
+//		graph.getViewport().setScalable(true);
 		graph.setVisibility(GraphView.VISIBLE);
 //		Log.d("Time",Calendar.getInstance().getTimeInMillis() - calendar.getTimeInMillis()+"");
 	}
